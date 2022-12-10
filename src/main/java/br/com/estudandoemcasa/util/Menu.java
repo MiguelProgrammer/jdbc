@@ -2,19 +2,20 @@ package br.com.estudandoemcasa.util;
 
 import br.com.estudandoemcasa.model.Produto;
 import br.com.estudandoemcasa.service.ProdutoService;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import lombok.extern.java.Log;
 
 import java.sql.SQLException;
 import java.util.Scanner;
 
 @Log
+@AllArgsConstructor
+@NoArgsConstructor
 public class Menu {
 
     Scanner input = new Scanner(System.in);
     ProdutoService produtoService = new ProdutoService();
-
-    public Menu() throws SQLException {
-    }
 
     public void menu() throws SQLException {
 

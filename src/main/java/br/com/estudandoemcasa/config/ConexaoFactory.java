@@ -22,10 +22,13 @@ public class ConexaoFactory {
     }
 
     public Connection conecta() throws SQLException {
-
-        if (conexao == null) {
-            conexao = DriverManager.getConnection(this.url, user, password);
-            log.info("Conectando ...");
+        try {
+            if (conexao == null) {
+                conexao = DriverManager.getConnection(this.url, user, password);
+                log.info("Conectando ...");
+            }
+        } catch(Exception e){
+            log.info("Erro ao se conectar. " + e.getMessage());
         }
         return conexao;
     }

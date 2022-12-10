@@ -1,0 +1,6 @@
+br\com\estudandoemcasa\config\ConexaoFactory.class
+br\com\estudandoemcasa\Main.class
+br\com\estudandoemcasa\repository\ProdutoRepository.class
+br\com\estudandoemcasa\TestaListagem.class
+br\com\estudandoemcasa\model\Produto.class
+br\com\estudandoemcasa\service\ProdutoService.class

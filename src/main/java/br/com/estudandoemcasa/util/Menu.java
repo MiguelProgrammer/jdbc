@@ -20,7 +20,8 @@ public class Menu {
 
 
         System.out.println("Digite uma opção\n\n" +
-                "1: Listar Produtos\n2: Buscar Produto por ID\n3: Sair");
+                "1: Listar Produtos\n2: Buscar Produto por ID\n" +
+                "3: Inserir Novo Produto\n4: Remover Produto\n5: Sair");
         Integer escolhe = input.nextInt();
 
 
@@ -38,6 +39,27 @@ public class Menu {
                 Integer id = input.nextInt();
                 Produto produto = produtoService.getProduto(id);
                 log.info("Produto: " + produto);
+                menu();
+                break;
+
+            case 3:
+
+                System.out.println("Digite o nome do Produto\n");
+                String nome = input.next();
+
+                input.nextLine();
+
+                System.out.println("Digite a descrição do Produto\n");
+                String descricao =  input.nextLine();
+
+                log.info("Id do Produto Inserido: " + produtoService.insertProduto(nome, descricao));
+                menu();
+                break;
+            case 4:
+
+                System.out.println("Digite o ID do Produto\n");
+                Integer idPro = input.nextInt();
+                log.info("Produto " + idPro + " removido? " + produtoService.deleteProduto(idPro));
                 menu();
                 break;
             default:

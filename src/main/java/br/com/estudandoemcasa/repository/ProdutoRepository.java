@@ -26,7 +26,7 @@ public class ProdutoRepository {
         statement = this.getConexaoFactory().conecta().createStatement();
     }
 
-    public List<Produto> list() throws SQLException {
+    public List<Produto> list() {
 
         List<Produto> produtos = new ArrayList<>();
 
@@ -45,11 +45,11 @@ public class ProdutoRepository {
 
         } catch (Exception e) {
             log.info("Erro ao listar Produtos. " + e.getMessage());
-        }  
+        }
         return produtos;
     }
 
-    public Produto getProduto(Integer id) throws SQLException {
+    public Produto getProduto(Integer id)  {
 
         Produto produto = null;
 
@@ -75,4 +75,45 @@ public class ProdutoRepository {
         return produto;
     }
 
+    public Integer insertProduto(String nome, String descricao) throws SQLException {
+
+        Integer lastId = null;
+        try {
+
+            preparedStatement = statement
+                    .getConnection()
+                    .prepareStatement("insert into produto (nome, descricao) values (?,?)",
+                            Statement.RETURN_GENERATED_KEYS);
+
+            preparedStatement.setString(1, nome);
+            preparedStatement.setString(2, descricao);
+            preparedStatement.execute();
+            resultSet = preparedStatement.getGeneratedKeys();
+            while (resultSet.next()) {
+                lastId = resultSet.getInt(1);
+            }
+        } catch (Exception e) {
+            log.info("Erro ao inserir novo produto. " + e.getMessage());
+        }
+        return lastId;
+    }
+
+    public Boolean delete(Integer id) throws SQLException {
+
+        Boolean aBoolean = null;
+
+        try {
+
+            preparedStatement = statement
+                    .getConnection()
+                    .prepareStatement("delete  from produto where id = ?");
+
+            preparedStatement.setInt(1, id);
+            aBoolean =  preparedStatement.executeUpdate() > 0;
+
+        } catch (Exception e) {
+            log.info("Erro ao buscar Produto. " + e.getMessage());
+        }
+        return aBoolean;
+    }
 }

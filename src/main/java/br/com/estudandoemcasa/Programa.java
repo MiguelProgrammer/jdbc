@@ -14,7 +14,7 @@ public class Programa {
             menu.menu();
 
         } catch (Exception e) {
-            log.info("Erro ao iniciar programa. " + e.getMessage());
+            log.info("Programa encerrado.");
         }
 
     }

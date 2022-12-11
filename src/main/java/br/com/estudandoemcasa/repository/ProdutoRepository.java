@@ -6,10 +6,7 @@ import lombok.Getter;
 import lombok.extern.java.Log;
 import lombok.var;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -22,8 +19,6 @@ public class ProdutoRepository {
     private ResultSet resultSet;
     private PreparedStatement prepState;
 
-    private String query;
-
     public ProdutoRepository() {
         this.conexaoFactory = new ConexaoFactory();
     }
@@ -34,7 +29,7 @@ public class ProdutoRepository {
         String queryList = "select * from produto";
         try {
 
-            prepState = this.conexaoFactory.conecta().prepareStatement(queryList);
+            prepState = conexaoFactory.conecta().prepareStatement(queryList);
             prepState.executeQuery();
             resultSet = prepState.getResultSet();
 
@@ -51,15 +46,17 @@ public class ProdutoRepository {
         return produtos;
     }
 
-    public Produto getProduto(Integer id) {
+    public Produto getProduto(Integer id) throws SQLException {
 
-        Optional<Produto> optionalProd = Optional.empty();
+        Optional<Produto> optionalProd;
         String queryWhere = "select * from produto where id = ?";
         try {
 
             prepState = this.conexaoFactory.conecta().prepareStatement(queryWhere);
             prepState.setInt(1, id);
-            prepState.executeQuery().next();
+            prepState.executeQuery();
+            resultSet = prepState.getResultSet();
+            resultSet.next();
 
             optionalProd = Optional.of(new Produto(
                     resultSet.getInt("id"),
@@ -67,7 +64,7 @@ public class ProdutoRepository {
                     resultSet.getString("descricao")));
 
         } catch (Exception e) {
-            log.info("Erro ao buscar Produto. " + e.getMessage());
+            throw e;
         }
         return optionalProd.orElse(null);
     }
@@ -79,15 +76,14 @@ public class ProdutoRepository {
         var IdCriado = Statement.RETURN_GENERATED_KEYS;
         try {
             prepState = this.conexaoFactory
-                    .conecta().prepareStatement(queryInsert,IdCriado);
+                    .conecta().prepareStatement(queryInsert, IdCriado);
 
             prepState.setString(1, nome);
             prepState.setString(2, descricao);
-            prepState.execute();
+            prepState.executeUpdate();
+            prepState.getGeneratedKeys().next();
+            lastId =  resultSet.getInt(1);
 
-            while (prepState.getGeneratedKeys().next()) {
-                lastId = resultSet.getInt(1);
-            }
         } catch (Exception e) {
             log.info("Erro ao inserir novo produto. " + e.getMessage());
         }
@@ -102,7 +98,7 @@ public class ProdutoRepository {
             prepState = this.conexaoFactory.conecta().prepareStatement(queryDelete);
             prepState.setInt(1, id);
         } catch (Exception e) {
-            log.info("Erro ao buscar Produto. " + e.getMessage());
+            log.info("Erro ao deletar Produto. " + e.getMessage());
         }
         return prepState.executeUpdate() > 0;
     }

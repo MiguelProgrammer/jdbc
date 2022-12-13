@@ -62,7 +62,7 @@ public class Menu {
     private void getProd() throws SQLException {
         System.out.println("Digite o ID do Produto\n");
         Integer id = input.nextInt();
-        produtoService.getProduto(id);
+        log.info("Produto: " + produtoService.getProduto(id).toString());
         menu();
     }
 

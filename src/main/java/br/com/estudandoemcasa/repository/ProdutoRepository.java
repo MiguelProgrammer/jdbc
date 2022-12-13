@@ -48,7 +48,7 @@ public class ProdutoRepository {
 
     public Produto getProduto(Integer id) throws SQLException {
 
-        Optional<Produto> optionalProd;
+        Produto produto = new Produto();
         String queryWhere = "select * from produto where id = ?";
         try {
 
@@ -56,24 +56,24 @@ public class ProdutoRepository {
             prepState.setInt(1, id);
             prepState.executeQuery();
             resultSet = prepState.getResultSet();
-            resultSet.next();
+            while(resultSet.next()) {
 
-            optionalProd = Optional.of(new Produto(
-                    resultSet.getInt("id"),
-                    resultSet.getString("nome"),
-                    resultSet.getString("descricao")));
+                produto = new Produto(
+                        resultSet.getInt("id"),
+                        resultSet.getString("nome"),
+                        resultSet.getString("descricao"));
+            }
+            return produto;
 
         } catch (Exception e) {
             throw e;
         }
-        return optionalProd.orElse(null);
     }
 
     public Integer insertProduto(String nome, String descricao) {
 
-        Integer lastId = null;
         String queryInsert = "insert into produto (nome, descricao) values (?,?)";
-        var IdCriado = Statement.RETURN_GENERATED_KEYS;
+        Integer IdCriado = Statement.RETURN_GENERATED_KEYS;
         try {
             prepState = this.conexaoFactory
                     .conecta().prepareStatement(queryInsert, IdCriado);
@@ -81,13 +81,14 @@ public class ProdutoRepository {
             prepState.setString(1, nome);
             prepState.setString(2, descricao);
             prepState.executeUpdate();
-            prepState.getGeneratedKeys().next();
-            lastId =  resultSet.getInt(1);
+            resultSet = prepState.getGeneratedKeys();
+            resultSet.next();
+            return  resultSet.getInt(1);
 
         } catch (Exception e) {
             log.info("Erro ao inserir novo produto. " + e.getMessage());
         }
-        return lastId;
+        return null;
     }
 
     public Boolean delete(Integer id) throws SQLException {

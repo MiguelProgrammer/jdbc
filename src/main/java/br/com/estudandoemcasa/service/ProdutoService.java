@@ -12,14 +12,14 @@ import java.util.List;
 public class ProdutoService {
     private final ProdutoRepository repository = new ProdutoRepository();
 
-    public ProdutoService() {
+    public ProdutoService() throws SQLException {
         /**
          *
          * @throws SQLException
          */
     }
 
-    public List<Produto> list() {
+    public List<Produto> list() throws SQLException {
         log.info("\nservice\nMétodo Lista Produtos\n");
         return this.repository.list();
     }
@@ -34,7 +34,7 @@ public class ProdutoService {
         return null;
     }
 
-    public Integer insertProduto(String nome, String descricao) {
+    public Integer insertProduto(String nome, String descricao) throws SQLException {
         log.info("\nservice\nMétodo Insere Produto\n");
         return this.repository.insertProduto(nome, descricao);
     }

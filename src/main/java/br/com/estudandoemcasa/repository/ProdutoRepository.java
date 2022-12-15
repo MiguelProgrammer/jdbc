@@ -6,10 +6,12 @@ import lombok.Getter;
 import lombok.extern.java.Log;
 import lombok.var;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Log
 @Getter
@@ -19,18 +21,18 @@ public class ProdutoRepository {
     private ResultSet resultSet;
     private PreparedStatement prepState;
 
-    public ProdutoRepository() {
+    public ProdutoRepository() throws SQLException {
         this.conexaoFactory = new ConexaoFactory();
+        this.conexaoFactory.conecta().setAutoCommit(false);
     }
 
-    public List<Produto> list() {
+    public List<Produto> list() throws SQLException {
 
         List<Produto> produtos = new ArrayList<>();
         String queryList = "select * from produto";
-        try {
-
-            prepState = conexaoFactory.conecta().prepareStatement(queryList);
-            prepState.executeQuery();
+        try(var ts= conexaoFactory.conecta().prepareStatement(queryList)) {
+            prepState = ts;
+            prepState.execute();
             resultSet = prepState.getResultSet();
 
             while (resultSet.next()) {
@@ -40,23 +42,20 @@ public class ProdutoRepository {
                         resultSet.getString("descricao")));
             }
 
-        } catch (Exception e) {
-            log.info("Erro ao listar Produtos. " + e.getMessage());
+            return produtos;
         }
-        return produtos;
     }
 
     public Produto getProduto(Integer id) throws SQLException {
 
         Produto produto = new Produto();
         String queryWhere = "select * from produto where id = ?";
-        try {
-
-            prepState = this.conexaoFactory.conecta().prepareStatement(queryWhere);
+        try(var ts = this.conexaoFactory.conecta().prepareStatement(queryWhere)) {
+            prepState = ts;
             prepState.setInt(1, id);
-            prepState.executeQuery();
+            prepState.execute();
             resultSet = prepState.getResultSet();
-            while(resultSet.next()) {
+            while (resultSet.next()) {
 
                 produto = new Produto(
                         resultSet.getInt("id"),
@@ -64,43 +63,33 @@ public class ProdutoRepository {
                         resultSet.getString("descricao"));
             }
             return produto;
-
-        } catch (Exception e) {
-            throw e;
         }
     }
 
-    public Integer insertProduto(String nome, String descricao) {
+    public Integer insertProduto(String nome, String descricao) throws SQLException {
 
         String queryInsert = "insert into produto (nome, descricao) values (?,?)";
-        Integer IdCriado = Statement.RETURN_GENERATED_KEYS;
-        try {
-            prepState = this.conexaoFactory
-                    .conecta().prepareStatement(queryInsert, IdCriado);
+        try(var ts = this.conexaoFactory
+                    .conecta().prepareStatement(queryInsert, Statement.RETURN_GENERATED_KEYS)){
 
+            prepState = ts;
             prepState.setString(1, nome);
             prepState.setString(2, descricao);
-            prepState.executeUpdate();
+            prepState.execute();
             resultSet = prepState.getGeneratedKeys();
             resultSet.next();
-            return  resultSet.getInt(1);
-
-        } catch (Exception e) {
-            log.info("Erro ao inserir novo produto. " + e.getMessage());
+            return resultSet.getInt(1);
         }
-        return null;
     }
 
     public Boolean delete(Integer id) throws SQLException {
 
         String queryDelete = "delete  from produto where id = ?";
 
-        try {
-            prepState = this.conexaoFactory.conecta().prepareStatement(queryDelete);
+        try(var ts = this.conexaoFactory.conecta().prepareStatement(queryDelete)){
+            prepState = ts;
             prepState.setInt(1, id);
-        } catch (Exception e) {
-            log.info("Erro ao deletar Produto. " + e.getMessage());
+            return prepState.executeUpdate() > 0;
         }
-        return prepState.executeUpdate() > 0;
     }
 }

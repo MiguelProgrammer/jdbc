@@ -23,14 +23,15 @@ public class ProdutoRepository {
 
     public ProdutoRepository() throws SQLException {
         this.conexaoFactory = new ConexaoFactory();
-        this.conexaoFactory.conecta().setAutoCommit(false);
     }
 
     public List<Produto> list() throws SQLException {
 
         List<Produto> produtos = new ArrayList<>();
         String queryList = "select * from produto";
-        try(var ts= conexaoFactory.conecta().prepareStatement(queryList)) {
+        try (var ts = conexaoFactory
+                .conecta()
+                .prepareStatement(queryList)) {
             prepState = ts;
             prepState.execute();
             resultSet = prepState.getResultSet();
@@ -48,29 +49,29 @@ public class ProdutoRepository {
 
     public Produto getProduto(Integer id) throws SQLException {
 
-        Produto produto = new Produto();
-        String queryWhere = "select * from produto where id = ?";
-        try(var ts = this.conexaoFactory.conecta().prepareStatement(queryWhere)) {
+        try (var ts = conexaoFactory
+                .conecta()
+                .prepareStatement("select * from produto where id = ?")) {
+
             prepState = ts;
             prepState.setInt(1, id);
             prepState.execute();
             resultSet = prepState.getResultSet();
-            while (resultSet.next()) {
+            resultSet.next();
 
-                produto = new Produto(
-                        resultSet.getInt("id"),
-                        resultSet.getString("nome"),
-                        resultSet.getString("descricao"));
-            }
-            return produto;
+            return new Produto(
+                    resultSet.getInt("id"),
+                    resultSet.getString("nome"),
+                    resultSet.getString("descricao"));
         }
     }
 
     public Integer insertProduto(String nome, String descricao) throws SQLException {
 
-        String queryInsert = "insert into produto (nome, descricao) values (?,?)";
-        try(var ts = this.conexaoFactory
-                    .conecta().prepareStatement(queryInsert, Statement.RETURN_GENERATED_KEYS)){
+        try (var ts = conexaoFactory
+                .conecta()
+                .prepareStatement("insert into produto (nome, descricao) values (?,?)",
+                        Statement.RETURN_GENERATED_KEYS)) {
 
             prepState = ts;
             prepState.setString(1, nome);
@@ -84,11 +85,12 @@ public class ProdutoRepository {
 
     public Boolean delete(Integer id) throws SQLException {
 
-        String queryDelete = "delete  from produto where id = ?";
-
-        try(var ts = this.conexaoFactory.conecta().prepareStatement(queryDelete)){
+        try (var ts =
+                     conexaoFactory
+                .conecta().prepareStatement("delete  from produto where id = ?")) {
             prepState = ts;
             prepState.setInt(1, id);
+
             return prepState.executeUpdate() > 0;
         }
     }

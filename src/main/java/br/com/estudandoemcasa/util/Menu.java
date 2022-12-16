@@ -49,6 +49,8 @@ public class Menu {
 
             default:
                 log.info("Fim do Programa.");
+                System.runFinalization();
+                break;
         }
     }
 

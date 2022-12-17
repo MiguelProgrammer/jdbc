@@ -40,7 +40,8 @@ public class ProdutoRepository {
                 produtos.add(new Produto(
                         resultSet.getInt("id"),
                         resultSet.getString("nome"),
-                        resultSet.getString("descricao")));
+                        resultSet.getString("descricao"),
+                        resultSet.getInt("categoria_id")));
             }
 
             return produtos;
@@ -49,9 +50,11 @@ public class ProdutoRepository {
 
     public Produto getProduto(Integer id) throws SQLException {
 
+        String query = "select * from produto where id = ?";
+
         try (var ts = conexaoFactory
                 .conecta()
-                .prepareStatement("select * from produto where id = ?")) {
+                .prepareStatement(query)) {
 
             prepState = ts;
             prepState.setInt(1, id);
@@ -62,20 +65,22 @@ public class ProdutoRepository {
             return new Produto(
                     resultSet.getInt("id"),
                     resultSet.getString("nome"),
-                    resultSet.getString("descricao"));
+                    resultSet.getString("descricao"),
+                    resultSet.getInt("categoria_id"));
         }
     }
 
-    public Integer insertProduto(String nome, String descricao) throws SQLException {
+    public Integer insertProduto(String nome, String descricao, Integer categoriaId) throws SQLException {
 
         try (var ts = conexaoFactory
                 .conecta()
-                .prepareStatement("insert into produto (nome, descricao) values (?,?)",
+                .prepareStatement("insert into produto (nome, descricao, categoria_id) values (?,?,?)",
                         Statement.RETURN_GENERATED_KEYS)) {
 
             prepState = ts;
             prepState.setString(1, nome);
             prepState.setString(2, descricao);
+            prepState.setInt(3, categoriaId);
             prepState.execute();
             resultSet = prepState.getGeneratedKeys();
             resultSet.next();
@@ -87,7 +92,7 @@ public class ProdutoRepository {
 
         try (var ts =
                      conexaoFactory
-                .conecta().prepareStatement("delete  from produto where id = ?")) {
+                .conecta().prepareStatement("delete from produto where id = ?")) {
             prepState = ts;
             prepState.setInt(1, id);
 

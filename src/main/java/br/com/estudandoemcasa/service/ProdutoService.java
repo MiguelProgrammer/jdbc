@@ -34,9 +34,9 @@ public class ProdutoService {
         return null;
     }
 
-    public Integer insertProduto(String nome, String descricao) throws SQLException {
+    public Integer insertProduto(String nome, String descricao, Integer catrgoriaId) throws SQLException {
         log.info("\nservice\nMétodo Insere Produto\n");
-        return this.repository.insertProduto(nome, descricao);
+        return this.repository.insertProduto(nome, descricao, catrgoriaId);
     }
 
     public Boolean deleteProduto(Integer id) throws SQLException {

@@ -2,15 +2,18 @@ package br.com.estudandoemcasa.model;
 
 import lombok.*;
 
+import java.util.List;
+
 @Getter
 @Setter
 @ToString
 @AllArgsConstructor
 @NoArgsConstructor
-public class Produto {
+public class Categoria {
 
     private Integer id;
     private String nome;
-    private String descricao;
-    private Integer categoriaId;
+    private List<Produto> produtos;
+
+
 }
